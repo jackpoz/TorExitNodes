@@ -47,12 +47,5 @@ namespace TorExitNodes
         {
             socket.Send(System.Text.Encoding.UTF8.GetBytes(text + "\r\n"));
         }
-
-        string read()
-        {
-            byte[] buffer = new byte[100];
-            socket.Receive(buffer);
-            return System.Text.Encoding.UTF8.GetString(buffer);
-        }
     }
 }
