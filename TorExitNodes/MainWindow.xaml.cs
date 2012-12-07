@@ -15,6 +15,7 @@ using System.Net;
 using System.IO;
 using System.Text.RegularExpressions;
 using mshtml;
+using System.Threading.Tasks;
 
 namespace TorExitNodes
 {
@@ -138,8 +139,12 @@ namespace TorExitNodes
                 if (exitNode)
                 {
                     string country = proxyMatch.Groups["country"].Value;
-                    if(country == CountryBox.Text)
-                        proxies.Add(new ProxyItem(proxyMatch.Groups["name"].Value, country));
+                    if (country == CountryBox.Text)
+                    {
+                        string name = proxyMatch.Groups["name"].Value;
+                        if(name != "unnamed")
+                            proxies.Add(new ProxyItem(name, country));
+                    }
                 }
                 proxyMatch = proxyMatch.NextMatch();
             }
@@ -182,6 +187,44 @@ namespace TorExitNodes
         private void Window_Closed(object sender, EventArgs e)
         {
             appData.WriteXml(Environment.CurrentDirectory + "\\" + appDataFileName);
+        }
+
+        private void UpdateTorConf_Click(object sender, RoutedEventArgs e)
+        {
+            if (Proxies == null || Proxies.Count == 0)
+            {
+                StatusLabel = "No proxies found.";
+                return;
+            }
+            else
+            {
+                StatusLabel = "Updating Tor configuration...";
+                WorkInProgress++;
+
+                Task.Factory.StartNew(() => UpdateTorConfiguration());
+            }
+        }
+
+        void UpdateTorConfiguration()
+        {
+            using (TorControlConnection conn = new TorControlConnection())
+            {
+                conn.Connect();
+
+                StringBuilder sb = new StringBuilder();
+                foreach (var proxy in Proxies)
+                {
+                    sb.Append(proxy.Name);
+                    sb.Append(',');
+                }
+
+                sb.Remove(sb.Length - 1, 1);
+
+                conn.SetExitNodes(sb.ToString());
+
+                StatusLabel = "Tor configuration updated.";
+                WorkInProgress--;
+            }
         }
     }
 }

@@ -12,6 +12,7 @@
             <Button Name="LoadTorListButton" Click="LoadTorListButton_Click">Load Tor List</Button>
             <Label>Country:</Label>
             <TextBox Name="CountryBox" Width="100" KeyDown="CountryBox_KeyDown"/>
+            <Button Name="UpdateTorConf" Margin="20,0,0,0" Click="UpdateTorConf_Click">Update Tor</Button>
         </StackPanel>
         <StackPanel Orientation="Vertical" Grid.Row="1">
             <DataGrid AutoGenerateColumns="True" Name="proxyGridView" Visibility="Hidden" SelectionUnit="Cell" />
